@@ -6,25 +6,21 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Employee extends Model
+class SocialBenefit extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'name',
-        'email',
-        'gender',
-        'phone',
-        'note',
-        'address',
-        'salary'
+        'description',
+        'default_amount',
     ];
 
     protected $casts = [
-        'salary' => 'decimal:2',
+        'default_amount' => 'decimal:2',
     ];
 
-    public function socialBenefits(): HasMany
+    public function employeeSocialBenefits(): HasMany
     {
         return $this->hasMany(EmployeeSocialBenefit::class);
     }

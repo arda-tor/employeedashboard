@@ -1,25 +1,27 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
-const emptyForm = {
-  name: '',
-  email: '',
-  gender: 'male',
-  phone: '',
-  address: '',
-  salary: '',
-  note: '',
-}
+const toFormState = (employee) => ({
+  name: employee?.name || '',
+  email: employee?.email || '',
+  gender: employee?.gender || 'male',
+  phone: employee?.phone || '',
+  address: employee?.address || '',
+  salary: employee?.salary == null ? '' : String(employee.salary),
+  note: employee?.note || '',
+})
 
-export default function EmployeeForm({ employee, onSubmit, onCancel }) {
-  const [form, setForm] = useState(emptyForm)
+const toPayload = (form) => ({
+  name: form.name.trim(),
+  email: form.email.trim(),
+  gender: form.gender,
+  phone: form.phone.trim(),
+  address: form.address.trim(),
+  salary: Number(form.salary),
+  note: form.note.trim() || null,
+})
 
-  useEffect(() => {
-    if (employee) {
-      setForm({ ...employee, salary: String(employee.salary), note: employee.note || '' })
-    } else {
-      setForm(emptyForm)
-    }
-  }, [employee])
+export default function EmployeeForm({ employee, onSubmit, onCancel, isSubmitting = false }) {
+  const [form, setForm] = useState(() => toFormState(employee))
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -27,7 +29,7 @@ export default function EmployeeForm({ employee, onSubmit, onCancel }) {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    onSubmit({ ...form, salary: parseFloat(form.salary) })
+    onSubmit(toPayload(form))
   }
 
   return (
@@ -168,15 +170,17 @@ export default function EmployeeForm({ employee, onSubmit, onCancel }) {
         <button
           type="button"
           onClick={onCancel}
+          disabled={isSubmitting}
           className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
         >
           Cancel
         </button>
         <button
           type="submit"
-          className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors cursor-pointer"
+          disabled={isSubmitting}
+          className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-indigo-300 transition-colors cursor-pointer"
         >
-          {employee ? 'Save Changes' : 'Add Employee'}
+          {isSubmitting ? 'Saving...' : employee ? 'Save Changes' : 'Add Employee'}
         </button>
       </div>
     </form>
